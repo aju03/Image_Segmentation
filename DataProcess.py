@@ -39,7 +39,7 @@ class DataPathProcessing(object):
 
     def __getitem__(self,key):
         return self.allDataPath[key]
-    
+
 
     def __returnSize(self,dPath):
         return nib.load(dPath).shape[0]
@@ -56,17 +56,17 @@ class DataPathProcessing(object):
         data_vol.sort(key = filtDig)
         data_vol_path = [(i,j) for i,j in zip(data_vol,data_seg)]
         return data_vol_path
-    
-    def __getAllDataPath(self):    
+
+    def __getAllDataPath(self):
         return flatList([*map(lambda x:self.__mapToTuples(x),self.__pathList)])
-    
+
     def __writeToFolder(self,data_path,size = 512):
         vol = nib.load(data_path[0]).get_data()
         seg = nib.load(data_path[1]).get_data()
 
         vol = interPolate(vol)
         seg = interPolate(seg)
-        
+
         for i in range(vol.shape[2]):
             if not os.path.exists(destinationFolder):
                 os.makedirs(destinationFolder)
@@ -84,13 +84,14 @@ class DataPathProcessing(object):
                 print(str(self.counter)+'/'+str(self.N))
 
         print("done")
-    
+
     def writeImageData(self):
         for data_path in self.allDataPath:
             self.__writeToFolder(data_path)
 
-    
+
 
 if __name__ == '__main__':
-    dtUtil = DataPathProcessing(['trainBatch1/batch1/*.nii','trainBatch2/batch2/*.nii'])
+    # dtUtil = DataPathProcessing(['trainBatch1/batch1/*.nii','trainBatch2/batch2/*.nii'])
+    dtUtil = DataPathProcessing(['trainBatch1/batch1/*.nii'])
     dtUtil.writeImageData()
