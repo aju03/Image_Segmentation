@@ -22,7 +22,7 @@ class Rescale(object):
                 new_h, new_w = self.output_size, self.output_size * w / h
         else:
             new_h, new_w = self.output_size
-            
+
         new_h , new_w = int(new_h), int(new_w)
 
         return {'scan' : cv2.resize(scan, (new_h,new_w)),
@@ -40,6 +40,11 @@ class ToTensor(object):
         return {'scan' : torch.from_numpy(scan),
                 'segmentation' : torch.from_numpy(segmentation)}
 
+class standardize(object):
+    def __call__(self,sample):
+        stdrdizde = lambda x : (x-x.min())/(x.max()-x.mean()) if not (x.min() == x.max() == 0) else x
+        return  {'scan' : stdrdizde(sample['scan']),
+                'segmentation' : stdrdizde(sample['segmentation'])}
 
 class LitsDataSet(Dataset):
     """ LITS Data Set """
@@ -73,6 +78,22 @@ class LitsDataSet(Dataset):
             sample = self.transform(sample)
         return sample
 
+    @classmethod
+    def create(_class, root_dir, batch_size = 100,
+                    shuffle = True, num_workers = 0):
+                    transform = transforms.Compose([
+                                                    # Rescale(256),
+                                                    ToTensor(),
+                                                    standardize()
+                                                    ])
+                    # transform.Normalize(mean = [0], std = [1])
+                    transformed_dataset = _class(root_dir = root_dir,
+                                                transform = transform)
+
+                    dataloader = DataLoader(transformed_dataset, batch_size = batch_size,
+                                            shuffle = shuffle, num_workers = num_workers)
+
+                    return dataloader
 
 
 if __name__ == '__main__':
@@ -81,6 +102,7 @@ if __name__ == '__main__':
                                                Rescale(256),
                                                ToTensor()
                                            ]))
+    transformed_dataset.Normalize(mean = [0], std = [1])
 
     dataloader = DataLoader(transformed_dataset, batch_size=1000,
                         shuffle=True, num_workers=0)

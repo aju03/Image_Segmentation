@@ -23,7 +23,7 @@ resize = lambda x,size: cv2.resize(x,(size,size))
 
 absFilePath = os.path.dirname(os.path.abspath(__file__))
 
-destinationFolder = os.path.join(absFilePath,'VolSegData')
+destinationFolder = os.path.join(absFilePath,'VolSegData1')
 
 allPath = []
 # ['trainBatch1/batch1/*.nii','trainBatch2/batch2/*.nii']
@@ -64,8 +64,8 @@ class DataPathProcessing(object):
         vol = nib.load(data_path[0]).get_data()
         seg = nib.load(data_path[1]).get_data()
 
-        vol = interPolate(vol)
-        seg = interPolate(seg)
+        # vol = interPolate(vol)
+        # seg = interPolate(seg)
 
         for i in range(vol.shape[2]):
             if not os.path.exists(destinationFolder):
