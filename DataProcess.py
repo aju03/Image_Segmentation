@@ -23,7 +23,7 @@ resize = lambda x,size: cv2.resize(x,(size,size))
 
 absFilePath = os.path.dirname(os.path.abspath(__file__))
 
-destinationFolder = os.path.join(absFilePath,'VolSegData1')
+destinationFolder = os.path.join(absFilePath,'VolSegData')
 
 allPath = []
 # ['trainBatch1/batch1/*.nii','trainBatch2/batch2/*.nii']
@@ -34,8 +34,8 @@ class DataPathProcessing(object):
             raise Exception('pathList must be list to nii data path')
         self.__pathList = pathList
         self.allDataPath = self.__getAllDataPath()
-        self.N = self.__countExample()
-        self.counter = 0
+        self.N = self.__countExample() + 14918
+        self.counter = 14918
 
     def __getitem__(self,key):
         return self.allDataPath[key]
@@ -93,5 +93,5 @@ class DataPathProcessing(object):
 
 if __name__ == '__main__':
     # dtUtil = DataPathProcessing(['trainBatch1/batch1/*.nii','trainBatch2/batch2/*.nii'])
-    dtUtil = DataPathProcessing(['trainBatch1/batch1/*.nii'])
+    dtUtil = DataPathProcessing(['trainBatch2/batch2/*.nii'])
     dtUtil.writeImageData()

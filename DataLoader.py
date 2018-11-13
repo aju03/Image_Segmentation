@@ -79,7 +79,7 @@ class LitsDataSet(Dataset):
             idx (int) : index to access data
         """
         data = np.load(os.path.join(self.root_dir,self.data_list[idx]))
-        
+
         scan = data[:,:512]
         segmentation = data[:,512:]
         sample = {'scan' : scan,'segmentation' : segmentation}
