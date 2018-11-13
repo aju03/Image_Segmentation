@@ -34,17 +34,25 @@ class ToTensor(object):
     def __call__(self,sample):
         scan , segmentation = sample['scan'], sample['segmentation']
         scan = scan.reshape(1,scan.shape[0],scan.shape[1])
-        segmentation = segmentation.reshape(1,segmentation.shape[0],
+        segmentation = segmentation.reshape(segmentation.shape[0]*
                                                 segmentation.shape[1])
 
-        return {'scan' : torch.from_numpy(scan),
-                'segmentation' : torch.from_numpy(segmentation)}
+        return {'scan' : torch.tensor(scan),
+                'segmentation' : torch.tensor(segmentation)}
 
-class standardize(object):
+class Standardize(object):
     def __call__(self,sample):
-        stdrdizde = lambda x : (x-x.min())/(x.max()-x.mean()) if not (x.min() == x.max() == 0) else x
-        return  {'scan' : stdrdizde(sample['scan']),
-                'segmentation' : stdrdizde(sample['segmentation'])}
+        standardize = lambda x : (x-x.min())/(x.max()-x.mean()) if not (x.min() == x.max() == 0) else x
+        return  {'scan' : standardize(sample['scan']),
+                'segmentation' : standardize(sample['segmentation'])}
+
+
+class LabelDiscritize(object):
+    def __call__(self,sample):
+        segmentation = sample['segmentation']
+        segmentation[segmentation>0] = 1
+        return {'scan' : sample['scan'],
+                'segmentation' : sample['segmentation']}
 
 class LitsDataSet(Dataset):
     """ LITS Data Set """
@@ -71,6 +79,7 @@ class LitsDataSet(Dataset):
             idx (int) : index to access data
         """
         data = np.load(os.path.join(self.root_dir,self.data_list[idx]))
+        
         scan = data[:,:512]
         segmentation = data[:,512:]
         sample = {'scan' : scan,'segmentation' : segmentation}
@@ -84,7 +93,8 @@ class LitsDataSet(Dataset):
                     transform = transforms.Compose([
                                                     # Rescale(256),
                                                     ToTensor(),
-                                                    standardize()
+                                                    Standardize(),
+                                                    LabelDiscritize(),
                                                     ])
                     # transform.Normalize(mean = [0], std = [1])
                     transformed_dataset = _class(root_dir = root_dir,

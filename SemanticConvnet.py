@@ -66,5 +66,6 @@ class Net(nn.Module):
             num_features *= s
         return num_features
 
-
-model = Net().double()
+    @classmethod
+    def create(net,*args,**kwargs):
+        return  net().double()
