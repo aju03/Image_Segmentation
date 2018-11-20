@@ -7,6 +7,9 @@ import os
 import numpy as np
 import torch
 import LitsDataSets as LITS
+from logLib import init_logging as initLog
+
+printWithLogging = initLog()
 
 absFilePath = os.path.dirname(os.path.abspath(__file__))
 
@@ -71,7 +74,7 @@ class Train:
                     per_batch_loss += loss.item()
                     if m_batch % 5 == 4:
                         per_batch_loss = per_scan_loss / 5
-                        print("[epoch : %5d | batch : %5d | per_batch_loss : %.5f]" % (epoch + 1, m_batch + 1, per_batch_loss ))
+                        printWithLogging.debug("[epoch : %10d | batch : %10d | per_batch_loss : %.10f]" % (epoch + 1, m_batch + 1, per_batch_loss ))
                         per_scan_loss += per_batch_loss
                         self.batch_loss.append(per_batch_loss)
                         per_batch_loss = 0.0
@@ -79,26 +82,26 @@ class Train:
                     if save_per_batch:
                         torch.save(self.model.state_dict(),self.checkpoint+'semanet_per_batch_'+str(m_batch+1)+'.torch')
 
-                    if(m_batch == 1):
-                        break
+                    # if(m_batch == 1):
+                        # break
 
                 if epoch == 0:
                     self.N += len(tensor_loader)
                 per_scan_loss /= len(tensor_loader)
                 per_epoch_loss += per_scan_loss
-                print("[epoch : %5d | scan : %5d | per_scan_loss : %.5f]" % (epoch + 1, i_scan + 1, per_scan_loss))
+                printWithLogging.debug("[epoch : %10d | scan : %10d | per_scan_loss : %.10f]" % (epoch + 1, i_scan + 1, per_scan_loss))
                 self.scan_loss.append(per_scan_loss)
                 per_scan_loss = 0.0
 
                 if save_per_scan:
                     torch.save(self.model.state_dict(),self.checkpoint+'semanet_per_scan_'+str(i_scan+1)+'.torch')
 
-                if(i_scan == 0):
-                    break
+                # if(i_scan == 0):
+                    # break
 
             per_epoch_loss /= self.N
 
-            print("[epoch : %5d | scan : %5d | per_epoc_loss : %.5f]" % (epoch + 1, i_scan + 1, per_epoch_loss))
+            printWithLogging.debug("[epoch : %10d | scan : %10d | per_epoc_loss : %.10f]" % (epoch + 1, i_scan + 1, per_epoch_loss))
             self.epoch_loss.append(per_epoch_loss)
             self.train_loss = per_epoch_loss
             per_epoch_loss = 0.0
@@ -106,14 +109,14 @@ class Train:
             if save_per_epoch:
                 torch.save(self.model.state_dict(),self.checkpoint+'semanet_per_epoch_'+str(epoch+1)+'.torch')
 
-            if(epoch == 0):
-                break
+            # if(epoch == 0):
+                # break
 
         np.save('train_loss',np.array([self.train_loss/self.N]))
         np.save('per_batch_loss',np.array(per_batch_loss))
         np.save("per_scan_loss",np.array(per_scan_loss))
         np.save("per_epoc_loss",np.array(per_epoch_loss))
-        print("-----Done---------")
+        printWithLogging.debug("-----Done---------")
 
     def testModel(
                     self,
@@ -132,22 +135,22 @@ class Train:
                     output = self.model.forward(inputs)
                     self.test_loss += self.criterion(output, label).item()
 
-                    if(j == 0):
-                        break
+                    # if(j == 0):
+                        # break
 
                 self.N_test += len(tensor_loader)
 
-                if(i == 0):
-                    break
+                # if(i == 0):
+                    # break
 
 
         np.save('test_loss',np.array([self.test_loss/self.N_test]))
-        print("Train Loss %.10f and Test Loss %.10f" % (self.train_loss,self.test_loss/self.N_test))
+        printWithLogging.debug("Train Loss %.10f and Test Loss %.10f" % (self.train_loss,self.test_loss/self.N_test))
 
 
     def saveModel(self):
         torch.save(self.model.state_dict(), self.checkpoint+'semanet.torch')
-        print("Model saved at location : " + self.checkpoint)
+        printWithLogging.debug("Model saved at location : " + self.checkpoint)
 
 
 if __name__ == '__main__':
@@ -161,7 +164,7 @@ if __name__ == '__main__':
                 batch_size = 10,
                 shuffle = True,
                 num_workers = 0,
-                num_epochs = 2,
+                num_epochs = 10,
                 load_from = None
                 )
 
