@@ -1,0 +1,6 @@
+Traceback (most recent call last):
+  File "mainDups.py", line 171, in <module>
+    tr.trainData(save_per_epoch = True)
+  File "mainDups.py", line 102, in trainData
+    per_epoch_loss /= self.N
+ZeroDivisionError: float division by zero

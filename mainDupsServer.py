@@ -163,7 +163,7 @@ if __name__ == '__main__':
                 checkpoint_dir = checkpoint_dir,
                 batch_size = 10,
                 shuffle = True,
-                num_workers = 0,
+                num_workers = 20,
                 num_epochs = 10,
                 load_from = None
                 )
